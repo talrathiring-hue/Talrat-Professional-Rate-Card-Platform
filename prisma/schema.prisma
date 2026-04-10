@@ -1,0 +1,380 @@
+// talrat.com — Prisma Schema
+// Run: npx prisma db push && npx prisma generate
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Auth (NextAuth v5 + Prisma Adapter) ────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  phone         String?
+  role          UserRole  @default(TALENT)
+  isBlocked     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  profile      Profile?
+  subscription Subscription?
+  tickets      SupportTicket[]
+  notifications NotificationPrefs?
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  TALENT
+  ADMIN
+}
+
+// ─── Profiles ─────────────────────────────────────────────────────────────────
+
+model Profile {
+  id           String       @id @default(cuid())
+  userId       String       @unique
+  slug         String       @unique
+  isPublished  Boolean      @default(false)
+  talentType   TalentType
+  displayName  String
+  headline     String?      @db.VarChar(160)
+  bio          String?      @db.Text
+  location     String?
+  avatarUrl    String?
+  availability Availability @default(AVAILABLE)
+  experience   Int?         // years
+
+  // Rate card (3 tiers)
+  tier1Label   String?      @default("Quick Call")
+  tier1Price   Int?         // in INR paise
+  tier1Desc    String?
+  tier2Label   String?      @default("Half Day")
+  tier2Price   Int?
+  tier2Desc    String?
+  tier2Popular Boolean      @default(true)
+  tier3Label   String?      @default("Full Project")
+  tier3Price   Int?
+  tier3Desc    String?
+
+  // Social links
+  websiteUrl   String?
+  linkedinUrl  String?
+  twitterUrl   String?
+  githubUrl    String?
+  instagramUrl String?
+  youtubeUrl   String?
+  dribbbleUrl  String?
+  behanceUrl   String?
+
+  // Adaptive fields (stored as JSON per talent type)
+  adaptiveData Json?
+
+  // Work samples (up to 6)
+  workSamples  WorkSample[]
+
+  // Skills (tags)
+  skills       Skill[]
+
+  // Analytics
+  totalViews   Int          @default(0)
+  totalLeads   Int          @default(0)
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analytics    Analytics[]
+  leads        Lead[]
+
+  @@index([slug])
+  @@index([talentType])
+  @@index([isPublished])
+}
+
+enum Availability {
+  AVAILABLE
+  BUSY
+  UNAVAILABLE
+}
+
+enum TalentType {
+  SOFTWARE_ENGINEER
+  FRONTEND_DEVELOPER
+  BACKEND_DEVELOPER
+  FULLSTACK_DEVELOPER
+  MOBILE_DEVELOPER
+  DATA_SCIENTIST
+  ML_ENGINEER
+  DEVOPS_ENGINEER
+  UI_UX_DESIGNER
+  GRAPHIC_DESIGNER
+  MOTION_DESIGNER
+  VIDEO_EDITOR
+  CONTENT_WRITER
+  COPYWRITER
+  SEO_SPECIALIST
+  SOCIAL_MEDIA_MANAGER
+  PRODUCT_MANAGER
+  BUSINESS_ANALYST
+  FINANCIAL_CONSULTANT
+  LEGAL_CONSULTANT
+  MARKETING_CONSULTANT
+  PHOTOGRAPHER
+}
+
+model WorkSample {
+  id          String   @id @default(cuid())
+  profileId   String
+  title       String
+  url         String
+  description String?  @db.VarChar(200)
+  order       Int      @default(0)
+
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  profileId String
+  name      String
+  order     Int      @default(0)
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+model Analytics {
+  id        String   @id @default(cuid())
+  profileId String
+  event     AnalyticsEvent
+  source    String?  // utm_source or referrer
+  location  String?  // country code
+  userAgent String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([createdAt])
+  @@index([event])
+}
+
+enum AnalyticsEvent {
+  PROFILE_VIEW
+  CONTACT_CLICK
+  WHATSAPP_CLICK
+  LINK_CLICK
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  profileId   String
+  name        String
+  email       String
+  company     String?
+  message     String   @db.Text
+  phone       String?
+  source      String?
+  notified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([createdAt])
+}
+
+// ─── Metrics Snapshots (for admin dashboard) ─────────────────────────────────
+
+model MetricsSnapshot {
+  id              String   @id @default(cuid())
+  date            DateTime @unique
+  totalUsers      Int      @default(0)
+  activeUsers     Int      @default(0)
+  paidUsers       Int      @default(0)
+  trialUsers      Int      @default(0)
+  mrr             Int      @default(0)   // in INR paise
+  arr             Int      @default(0)
+  newSignups      Int      @default(0)
+  churned         Int      @default(0)
+  profileViews    Int      @default(0)
+  leadsGenerated  Int      @default(0)
+  createdAt       DateTime @default(now())
+}
+
+// ─── Subscriptions ────────────────────────────────────────────────────────────
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  plan                 Plan               @default(FREE_TRIAL)
+  status               SubscriptionStatus @default(TRIAL)
+  trialEndsAt          DateTime?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+
+  // Razorpay
+  razorpayCustomerId   String?
+  razorpaySubId        String?
+
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments             Payment[]
+
+  @@index([status])
+  @@index([plan])
+}
+
+enum Plan {
+  FREE_TRIAL
+  PRO
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+model Payment {
+  id               String        @id @default(cuid())
+  subscriptionId   String
+  amount           Int           // in INR paise
+  currency         String        @default("INR")
+  status           PaymentStatus @default(PENDING)
+  razorpayOrderId  String?       @unique
+  razorpayPayId    String?       @unique
+  invoiceUrl       String?
+  createdAt        DateTime      @default(now())
+
+  subscription     Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([createdAt])
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+// ─── Support Tickets ──────────────────────────────────────────────────────────
+
+model SupportTicket {
+  id        String       @id @default(cuid())
+  userId    String
+  subject   String
+  status    TicketStatus @default(OPEN)
+  priority  TicketPriority @default(MEDIUM)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  TicketMessage[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model TicketMessage {
+  id        String   @id @default(cuid())
+  ticketId  String
+  body      String   @db.Text
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+// ─── Notification Preferences ─────────────────────────────────────────────────
+
+model NotificationPrefs {
+  id              String  @id @default(cuid())
+  userId          String  @unique
+  emailOnView     Boolean @default(false)
+  emailOnLead     Boolean @default(true)
+  whatsappOnView  Boolean @default(false)
+  whatsappOnLead  Boolean @default(true)
+  weeklyDigest    Boolean @default(true)
+
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
