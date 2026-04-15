@@ -2,12 +2,13 @@
 // Run: npx prisma db push && npx prisma generate
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+ 
 }
 
 datasource db {
-  provider  = "postgresql"
-
+  provider = "postgresql"
+  
 }
 
 // ─── Auth (NextAuth v5 + Prisma Adapter) ────────────────────────────────────

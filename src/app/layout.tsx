@@ -15,7 +15,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: 'talrat — Your professional rate card',
+    default: 'Talrat — Your professional rate card',
     template: '%s | talrat',
   },
   description:

@@ -80,11 +80,11 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
 
-      {/* ── Nav ── */}
+      {/*Nav  */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-100">
         <div className="container-lg flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-brand-600 font-display">talrat</span>
+            <span className="text-xl font-bold text-brand-600 font-display">Talrat</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/auth/login" className="text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors">
@@ -120,7 +120,7 @@ export default function HomePage() {
             <Link href="/auth/register" className="btn-primary text-base py-3 px-8">
               Create your rate card →
             </Link>
-            <Link href="/priya-sharma" className="btn-secondary text-base py-3 px-8">
+            <Link href="/santhosh-prakash" className="btn-secondary text-base py-3 px-8">
               See an example
             </Link>
           </div>
