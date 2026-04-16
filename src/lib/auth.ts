@@ -10,7 +10,10 @@ import Resend from 'next-auth/providers/resend'
 import { prisma } from '@/lib/prisma'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
+   adapter:
+  process.env.NODE_ENV === "production"
+    ? PrismaAdapter(prisma)
+    : undefined,
 
   providers: [
     Google({

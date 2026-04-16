@@ -5,7 +5,6 @@
 // - POST /api/auth/signout
 // - GET  /api/auth/callback/google
 // - POST /api/auth/signin/resend  (magic link)
-
 import { handlers } from '@/lib/auth'
 
 export const { GET, POST } = handlers
