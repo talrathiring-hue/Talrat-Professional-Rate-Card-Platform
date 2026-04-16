@@ -75,8 +75,8 @@ export default function AuthLayout({
             {/* Testimonial */}
             <div className="bg-white/5 rounded-xl p-5 border border-white/10">
               <p className="text-slate-300 text-sm italic leading-relaxed mb-4">
-                "I got my first client enquiry within 2 days of creating my talrat profile.
-                The WhatsApp notification hit while I was having chai."
+                &quot;I got my first client enquiry within 2 days of creating my talrat profile.
+                The WhatsApp notification hit while I was having chai.&quot;
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white text-sm font-semibold">
