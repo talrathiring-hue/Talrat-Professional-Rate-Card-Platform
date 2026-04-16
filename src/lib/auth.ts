@@ -9,11 +9,10 @@ import Google from 'next-auth/providers/google'
 import Resend from 'next-auth/providers/resend'
 import { prisma } from '@/lib/prisma'
 
+const isBuild = process.env.NEXT_PHASE === "phase-production-build";
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
- adapter:
-  process.env.VERCEL_ENV === "production"
-    ? PrismaAdapter(prisma)
-    : undefined,
+  adapter: !isBuild ? PrismaAdapter(prisma) : undefined,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
