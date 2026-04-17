@@ -1,5 +1,3 @@
-// src/lib/auth.types.ts
-// Updated for JWT strategy — session shape matches jwt + session callbacks
 
 import { DefaultSession } from 'next-auth'
 
