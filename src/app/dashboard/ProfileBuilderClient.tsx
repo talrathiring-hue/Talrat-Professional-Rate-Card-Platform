@@ -148,6 +148,7 @@ export function ProfileBuilderClient({ existingProfile, userName }: Props) {
     if (!isEditing && data.displayName && !data.slug) {
       set('slug', generateSlug(data.displayName))
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.displayName])
 
   // Live slug check
@@ -650,7 +651,7 @@ function Step3RateCard({ data, set }: { data: WizardData; set: (k: keyof WizardD
                 <label className="ml-auto flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
                   <input type="checkbox" checked={data.tier2Popular}
                     onChange={e => set('tier2Popular', e.target.checked)} />
-                  "Popular" badge
+                  &quot;Popular&quot; badge
                 </label>
               )}
             </div>
