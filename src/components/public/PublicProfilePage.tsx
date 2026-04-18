@@ -193,7 +193,7 @@ function ContactForm({ profile, onClose }: { profile: Profile; onClose?: () => v
         <label className="label">Message *</label>
         <textarea className="textarea" rows={4} value={form.message}
           onChange={e => set('message', e.target.value)}
-          placeholder={`Hi ${profile.displayName.split(' ')[0]}, I'm looking for help with...`}
+          placeholder={"Hi " + profile.displayName.split(' ')[0] + ", I'm looking for help with..."}
           required maxLength={1000} />
         <p className="text-xs text-slate-400 mt-1 text-right">{form.message.length}/1000</p>
       </div>
