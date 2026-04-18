@@ -5,6 +5,7 @@
 // Features: hero, rate card, skills, work samples, social links, contact form
 
 import { useState, useEffect, useTransition } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   MapPin, Briefcase, Globe, ExternalLink,
@@ -193,7 +194,7 @@ function ContactForm({ profile, onClose }: { profile: Profile; onClose?: () => v
         <label className="label">Message *</label>
         <textarea className="textarea" rows={4} value={form.message}
           onChange={e => set('message', e.target.value)}
-          placeholder={"Hi " + profile.displayName.split(' ')[0] + ", I'm looking for help with..."}
+          placeholder={`Hi ${profile.displayName.split(' ')[0]}, I'm looking for help with...`}
           required maxLength={1000} />
         <p className="text-xs text-slate-400 mt-1 text-right">{form.message.length}/1000</p>
       </div>
@@ -276,9 +277,11 @@ export function PublicProfilePage({ profile }: Props) {
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                   {profile.avatarUrl ? (
-                    <img
+                    <Image
                       src={profile.avatarUrl}
                       alt={profile.displayName}
+                      width={80}
+                      height={80}
                       className="w-20 h-20 rounded-2xl object-cover ring-4 ring-white shadow-card"
                     />
                   ) : (
