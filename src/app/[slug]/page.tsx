@@ -122,7 +122,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+//  Page
 export default async function ProfilePage({ params }: PageProps) {
   const profile = await getProfile(params.slug)
   if (!profile) notFound()

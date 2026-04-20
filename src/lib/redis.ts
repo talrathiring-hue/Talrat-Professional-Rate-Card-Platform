@@ -1,3 +1,5 @@
+// src/lib/redis.ts
+// Upgraded for Day 5:
 // - Graceful fallback when Upstash not configured (dev without Redis)
 // - Connection health check
 // - Typed cache helpers
@@ -55,12 +57,12 @@ export function getProfileViewLimiter(): Ratelimit {
   return _profileViewLimiter
 }
 
-// Contact form: 3 submissions per IP per 24 hours
+// Contact form: 5 submissions per IP per 24 hours
 export function getContactFormLimiter(): Ratelimit {
   if (!_contactFormLimiter) {
     _contactFormLimiter = new Ratelimit({
       redis: getRedis(),
-      limiter: Ratelimit.slidingWindow(3, '24 h'),
+      limiter: Ratelimit.slidingWindow(5, '24 h'),
       analytics: true,
       prefix: 'rl:contact',
     })

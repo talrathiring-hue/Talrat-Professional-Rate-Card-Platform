@@ -488,7 +488,7 @@ function Step2BasicInfo({ data, set, cfg, slugAvailable, checkingSlug, isEditing
         <div>
           <label className="label">Your name *</label>
           <input className="input" value={data.displayName}
-            onChange={e => set('displayName', e.target.value)} placeholder="Priya Sharma" autoFocus />
+            onChange={e => set('displayName', e.target.value)} placeholder="Santhosh Prakash" autoFocus />
         </div>
         <div>
           <label className="label">Profile URL *</label>
@@ -501,7 +501,7 @@ function Step2BasicInfo({ data, set, cfg, slugAvailable, checkingSlug, isEditing
                 )}
                 value={data.slug}
                 onChange={e => set('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
-                placeholder="priya-sharma"
+                placeholder="santhosh-prakash"
                 disabled={isEditing}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
