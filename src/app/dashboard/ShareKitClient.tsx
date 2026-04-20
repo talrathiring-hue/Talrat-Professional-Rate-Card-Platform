@@ -354,7 +354,7 @@ export function ShareKitClient({ profile }: Props) {
       <div>
         <h1 className="text-2xl font-bold text-slate-900 font-display">Share Kit</h1>
         <p className="text-slate-500 text-sm mt-1">
-          Ready-to-copy templates for {firstName}'s profile
+          {"Ready-to-copy templates for " + firstName + "'s profile"}
         </p>
       </div>
 

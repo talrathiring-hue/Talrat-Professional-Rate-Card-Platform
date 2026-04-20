@@ -15,7 +15,7 @@ export default auth((req) => {
   const isAdminRoute = path.startsWith('/admin')
   const isAuthRoute  = path.startsWith('/auth')
 
-  // ── Dashboard: must be logged in ─────────────────────────────────────────
+  // ── Dashboard: must be logged in 
   if (isDashboard && !isLoggedIn) {
     const loginUrl = new URL('/auth/login', nextUrl)
     loginUrl.searchParams.set('callbackUrl', path)
