@@ -15,8 +15,7 @@ export default function ProfileNotFound() {
           Profile not found
         </h1>
         <p className="text-slate-500 text-sm mb-8 leading-relaxed">
-          This profile doesn't exist or hasn't been published yet.
-          Double-check the URL or search for the person on talrat.
+          {"This profile doesn't exist or hasn't been published yet.Double-check the URL or search for the person on talrat."}
         </p>
         <Link
           href="/"
