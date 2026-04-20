@@ -1,5 +1,3 @@
-// src/app/api/profile/slug/route.ts
-// GET /api/profile/slug?slug=priya-sharma
 // Checks if a slug is available — used live in the profile builder
 export const runtime = "nodejs"
 import { NextResponse } from 'next/server'

@@ -1,8 +1,5 @@
 'use client'
-// src/components/dashboard/ProfileCompleteness.tsx
-// Calculates and displays a profile completeness score (0–100%)
-// with actionable tips for what to fill in next.
-// Shown in the preview panel alongside the live preview.
+
 
 import { cn } from '@/lib/utils'
 import { CheckCircle, Circle, ChevronRight } from 'lucide-react'

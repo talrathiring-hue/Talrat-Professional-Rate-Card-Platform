@@ -1,5 +1,3 @@
-// src/app/[slug]/not-found.tsx
-// Shown when a profile slug doesn't exist or isn't published
 
 import Link from 'next/link'
 import { ArrowLeft, Search } from 'lucide-react'

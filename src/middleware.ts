@@ -1,9 +1,3 @@
-// src/middleware.ts
-// FIXED: Edge-safe middleware — reads JWT token, never touches Prisma
-//
-// The key fix: we import auth from next-auth directly with a config
-// that ONLY uses JWT (no database adapter calls).
-// This runs fine on Edge Runtime.
 
 import { auth } from '@/lib/auth'
 import { NextResponse } from 'next/server'

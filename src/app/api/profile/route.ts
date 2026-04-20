@@ -1,6 +1,3 @@
-// src/app/api/profile/route.ts
-// Fixed for Day 7 — Prisma v5 compatible
-// Fixes: adaptiveData type, all spread operator patterns
 
 import { NextResponse }           from 'next/server'
 import { auth }                   from '@/lib/auth'

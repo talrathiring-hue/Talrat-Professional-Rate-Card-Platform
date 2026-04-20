@@ -1,7 +1,3 @@
-// src/lib/whatsapp.ts
-// Twilio WhatsApp Business API service
-// Sends instant notifications to talent when they receive leads
-// Also handles trial expiry reminders
 
 import twilio from 'twilio'
 

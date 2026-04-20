@@ -1,7 +1,4 @@
 'use client'
-// src/lib/hooks/useProfile.ts
-
-
 import { useState, useCallback } from 'react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────

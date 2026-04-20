@@ -1,6 +1,4 @@
-// src/lib/talent-types.ts
-// All 22 talent types with adaptive fields, rate card defaults,
-// suggested skills, and headline templates for the profile builder
+
 
 export type TalentTypeKey =
   | 'SOFTWARE_ENGINEER' | 'FRONTEND_DEVELOPER' | 'BACKEND_DEVELOPER'

@@ -1,8 +1,4 @@
 'use client'
-// src/components/dashboard/AnalyticsClient.tsx
-// Full analytics dashboard UI
-// Charts: views over time (area), leads over time (bar)
-// Tables: lead sources, visitor locations, recent leads
 
 import { useState } from 'react'
 import {

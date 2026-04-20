@@ -1,4 +1,4 @@
-// src/app/api/analytics/route.ts
+
 // Records analytics events (profile views, contact clicks)
 // Rate limited per IP to prevent artificial inflation
 

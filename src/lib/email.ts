@@ -1,7 +1,4 @@
-// src/lib/email.ts
-// Resend email service — all transactional emails for talrat.com
-// Templates: new lead notification, magic link (handled by NextAuth),
-// trial expiry reminder, welcome email
+
 
 import { Resend } from 'resend'
 

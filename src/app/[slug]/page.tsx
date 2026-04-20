@@ -1,8 +1,3 @@
-// src/app/[slug]/page.tsx
-// Public profile page — talrat.com/priya-sharma
-// ISR: revalidates every 60 seconds
-// Redis: cached for 5 minutes for instant repeat loads
-// Full SEO metadata + JSON-LD structured data
 
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
@@ -11,15 +6,15 @@ import { PublicProfilePage } from '@/components/public/PublicProfilePage'
 import type { Metadata } from 'next'
 import { TALENT_TYPE_LABELS } from '@/lib/utils'
 
-// ─── ISR config ───────────────────────────────────────────────────────────────
-export const revalidate = 60 // revalidate every 60 seconds
+// ISR config 
+export const revalidate = 60 
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Types 
 interface PageProps {
   params: { slug: string }
 }
 
-// ─── Data fetcher (with Redis cache) ─────────────────────────────────────────
+// ─── Data fetcher (with Redis cache) 
 async function getProfile(slug: string) {
   // Try Redis cache first
   const cached = await getCachedProfile(slug)
@@ -86,7 +81,7 @@ async function getProfile(slug: string) {
   return serialised
 }
 
-// ─── Metadata (SEO) ───────────────────────────────────────────────────────────
+// ─── Metadata (SEO)
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const profile = await getProfile(params.slug)
   if (!profile) return { title: 'Profile not found' }

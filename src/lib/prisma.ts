@@ -1,7 +1,3 @@
-// src/lib/prisma.ts
-// Fixed for Prisma v5 + Edge Runtime compatibility
-// Removed $on('query') — it is not supported in Edge Runtime
-// and causes the middleware to crash
 
 import { PrismaClient } from '@prisma/client'
 

@@ -1,6 +1,4 @@
-// src/app/api/auth/[...nextauth]/route.ts
-// This MUST be exactly this — no extra imports, no logic
-// Just re-export the handlers from auth.ts
+// Just re export the handlers from auth.ts
 
 import { handlers } from '@/lib/auth'
 

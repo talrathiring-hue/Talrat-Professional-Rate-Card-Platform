@@ -1,5 +1,3 @@
-// src/app/api/contact/route.ts
-// FIXED: Separate queries instead of include — avoids all relation name TypeScript errors
 // Works regardless of what the NotificationPrefs relation is called in schema.prisma
 
 import { NextResponse }    from 'next/server'

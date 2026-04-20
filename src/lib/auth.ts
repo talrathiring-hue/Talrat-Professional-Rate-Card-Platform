@@ -1,5 +1,3 @@
-// src/lib/auth.ts
-// Updated Day 10 — sends welcome email when a new user signs up
 
 import NextAuth                  from 'next-auth'
 import { PrismaAdapter }         from '@auth/prisma-adapter'

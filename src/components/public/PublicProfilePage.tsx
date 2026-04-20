@@ -1,7 +1,6 @@
 'use client'
-// src/components/public/PublicProfilePage.tsx
-// The full public profile page — what companies see at talrat.com/slug
-// Design: clean, professional, LinkedIn-inspired but distinctly talrat
+// The full public profile page   what companies see at talrat.com/slug
+// Design: clean, professional, LinkedIn inspired but distinctly talrat
 // Features: hero, rate card, skills, work samples, social links, contact form
 
 import { useState, useEffect, useTransition } from 'react'

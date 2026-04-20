@@ -1,8 +1,5 @@
 'use client'
-// src/components/dashboard/ShareKitClient.tsx
-// FIXED:
-// 1. QR code generated using qrcode.js (client-side canvas) — no external API
-// 2. Download works reliably from canvas element
+
 
 import { useState, useEffect, useRef } from 'react'
 import { toast }    from 'sonner'

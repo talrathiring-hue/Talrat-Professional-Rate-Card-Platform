@@ -1,7 +1,6 @@
-// src/app/api/health/route.ts
 // Health check endpoint — GET /api/health
 // Shows status of: database, Redis, env vars, all services
-// Used to verify everything is wired up correctly after Day 5 setup
+// Used to verify everything is wired up correctly
 
 import { NextResponse } from 'next/server'
 import { checkDatabaseConnection } from '@/lib/prisma'

@@ -1,5 +1,3 @@
-// src/app/dashboard/share/page.tsx
-// Share kit page — fetches profile and renders 4 channel templates
 
 import { auth }           from '@/lib/auth'
 import { redirect }       from 'next/navigation'

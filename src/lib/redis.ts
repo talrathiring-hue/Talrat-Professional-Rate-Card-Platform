@@ -1,9 +1,3 @@
-// src/lib/redis.ts
-// Upgraded for Day 5:
-// - Graceful fallback when Upstash not configured (dev without Redis)
-// - Connection health check
-// - Typed cache helpers
-// - Better rate limiter configs
 
 import { Redis } from '@upstash/redis'
 import { Ratelimit } from '@upstash/ratelimit'

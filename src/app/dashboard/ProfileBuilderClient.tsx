@@ -1,8 +1,5 @@
 'use client'
-// src/components/dashboard/ProfileBuilderClient.tsx
-// Updated Day 8 — adds live preview panel + completeness score
-// Layout: wizard on left, preview panel on right (desktop)
-// Mobile: preview toggle button shows/hides preview
+
 
 import { useState, useEffect, useCallback, useTransition } from 'react'
 import { useRouter } from 'next/navigation'

@@ -1,8 +1,5 @@
 'use client'
-// src/components/dashboard/ProfilePreview.tsx
-// Live preview — renders the public profile card in real time
-// as the user types in the wizard. Every keystroke updates this.
-// Mirrors the exact design of the public profile page (Day 9).
+
 
 import { cn, formatINR, TALENT_TYPE_EMOJIS, TALENT_TYPE_LABELS  } from '@/lib/utils'
 import {

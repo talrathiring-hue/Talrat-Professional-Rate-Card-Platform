@@ -62,7 +62,7 @@ export default async function AnalyticsPage() {
   const day30ago = daysAgo(30)
   const day7ago  = daysAgo(7)
 
-  // ── Parallel data fetching ──────────────────────────────────────────────────
+  // ── Parallel data fetching 
   const [
     totalViewsAll,
     viewsLast30,
