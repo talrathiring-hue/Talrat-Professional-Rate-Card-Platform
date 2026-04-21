@@ -1,10 +1,5 @@
 'use client'
-// src/components/dashboard/BillingClient.tsx
-// Full billing page UI:
-// - Current plan status card
-// - Upgrade CTA with Razorpay checkout
-// - Cancel confirmation flow
-// - Payment history table
+
 
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter }                           from 'next/navigation'
@@ -16,7 +11,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Types 
 interface Subscription {
   plan:               string
   status:             string
@@ -209,7 +204,7 @@ function CancelModal({
           <p className="text-xs text-warning-700 leading-relaxed">
             Your PRO access and profile will remain live until{' '}
             <strong>{formatDate(periodEnd)}</strong>. After that, your profile will
-            go offline and you'll stop receiving lead notifications.
+            go offline and you will stop receiving lead notifications.
           </p>
         </div>
 
@@ -453,7 +448,7 @@ export function BillingClient({ subscription, payments, userEmail, userName }: P
           <div className="card p-5">
             <h2 className="text-sm font-semibold text-slate-900 mb-1">Cancel subscription</h2>
             <p className="text-xs text-slate-500 mb-4">
-              You'll retain PRO access until{' '}
+              {"You'll retain PRO access until"}
               <strong>{formatDate(subscription?.currentPeriodEnd ?? null)}</strong>.
               After that your profile will go offline.
             </p>
