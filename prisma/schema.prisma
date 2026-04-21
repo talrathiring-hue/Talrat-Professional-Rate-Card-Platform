@@ -271,6 +271,9 @@ model Subscription {
   cancelAtPeriodEnd    Boolean            @default(false)
 
   // Razorpay
+  razorpayOrderId    String?   // order_xxx
+  razorpayPaymentId  String?   // pay_xxx
+  
   razorpayCustomerId   String?
   razorpaySubId        String?
 
@@ -283,6 +286,9 @@ model Subscription {
   @@index([status])
   @@index([plan])
 }
+
+
+
 
 enum Plan {
   FREE_TRIAL
@@ -299,6 +305,8 @@ enum SubscriptionStatus {
 
 model Payment {
   id               String        @id @default(cuid())
+    userId    String
+    description String?   
   subscriptionId   String
   amount           Int           // in INR paise
   currency         String        @default("INR")
@@ -307,7 +315,7 @@ model Payment {
   razorpayPayId    String?       @unique
   invoiceUrl       String?
   createdAt        DateTime      @default(now())
-
+  paymentId String? @unique 
   subscription     Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
   @@index([subscriptionId])

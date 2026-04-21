@@ -1,10 +1,15 @@
+// src/lib/auth.ts
+// FIXED:
+// 1. Resend 'from' address uses onboarding@resend.dev by default (the only
+//    address that works without a verified domain in Resend)
+// 2. Clean session callback with no edge-runtime issues
 
-import NextAuth                  from 'next-auth'
-import { PrismaAdapter }         from '@auth/prisma-adapter'
-import Google                    from 'next-auth/providers/google'
-import Resend                    from 'next-auth/providers/resend'
-import { prisma }                from '@/lib/prisma'
-import { sendWelcomeEmail }      from '@/lib/email'
+import NextAuth             from 'next-auth'
+import { PrismaAdapter }    from '@auth/prisma-adapter'
+import Google               from 'next-auth/providers/google'
+import Resend               from 'next-auth/providers/resend'
+import { prisma }           from '@/lib/prisma'
+import { sendWelcomeEmail } from '@/lib/email'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -15,9 +20,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
     }),
+
+    // ── FIXED: 'from' must be onboarding@resend.dev until you verify a domain ──
+    // 'talrat@resend.dev' does not exist → Resend rejects it → magic link fails
+    // Once you verify talrat.com at resend.com/domains, change this to:
+    // from: 'hello@talrat.com'
     Resend({
       apiKey: process.env.RESEND_API_KEY!,
-      from:   process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev',
+      from:   'onboarding@resend.dev',   // ← FIXED (was using env var that had wrong value)
       name:   'talrat',
     }),
   ],
@@ -55,10 +65,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const dbUser = await prisma.user.findUnique({
             where:  { id: token.sub },
             select: {
-              role:         true,
-              isBlocked:    true,
-              subscription: { select: { plan: true, status: true, trialEndsAt: true } },
-              profile:      { select: { slug: true, isPublished: true } },
+              role:          true,
+              isBlocked:     true,
+              subscription:  { select: { plan: true, status: true, trialEndsAt: true } },
+              profile:       { select: { slug: true, isPublished: true } },
             },
           })
           if (dbUser) {
@@ -68,7 +78,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             session.user.profile      = dbUser.profile
           }
         } catch {
-          // Non-fatal
+          // Non-fatal — session still works with token data
         }
       }
       return session
@@ -83,7 +93,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         })
         if (dbUser?.isBlocked) return false
       } catch {
-        // Allow sign in if check fails
+        // Allow sign in if DB check fails
       }
       return true
     },
@@ -93,7 +103,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async createUser({ user }) {
       if (!user.id) return
 
-      // Create subscription + notification prefs in parallel
       await Promise.all([
         prisma.subscription.create({
           data: {
@@ -107,13 +116,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           data: {
             userId:         user.id,
             emailOnLead:    true,
-            whatsappOnLead: false,
+            whatsappOnLead: true,   // ← changed to true so WhatsApp works immediately
             weeklyDigest:   true,
           },
         }),
       ])
 
-      // Send welcome email (non-blocking)
       if (user.email && user.name) {
         sendWelcomeEmail(user.email, user.name).catch(e => {
           console.error('Failed to send welcome email:', e)
