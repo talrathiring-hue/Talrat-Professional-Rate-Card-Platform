@@ -1,8 +1,4 @@
-// src/lib/auth.ts
-// FIXED:
-// 1. Resend 'from' address uses onboarding@resend.dev by default (the only
-//    address that works without a verified domain in Resend)
-// 2. Clean session callback with no edge-runtime issues
+
 
 import NextAuth             from 'next-auth'
 import { PrismaAdapter }    from '@auth/prisma-adapter'
@@ -21,13 +17,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       allowDangerousEmailAccountLinking: true,
     }),
 
-    // ── FIXED: 'from' must be onboarding@resend.dev until you verify a domain ──
-    // 'talrat@resend.dev' does not exist → Resend rejects it → magic link fails
-    // Once you verify talrat.com at resend.com/domains, change this to:
-    // from: 'hello@talrat.com'
     Resend({
       apiKey: process.env.RESEND_API_KEY!,
-      from:   'onboarding@resend.dev',   // ← FIXED (was using env var that had wrong value)
+      from:   'onboarding@resend.dev',
       name:   'talrat',
     }),
   ],
@@ -60,6 +52,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.isBlocked = (token.isBlocked as any) ?? false
       }
 
+      // Enrich session with DB data — wrapped in try/catch so a DB
+      // failure never breaks the session for new users
       if (token.sub) {
         try {
           const dbUser = await prisma.user.findUnique({
@@ -67,8 +61,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             select: {
               role:          true,
               isBlocked:     true,
-              subscription:  { select: { plan: true, status: true, trialEndsAt: true } },
-              profile:       { select: { slug: true, isPublished: true } },
+              subscription:  {
+                select: { plan: true, status: true, trialEndsAt: true },
+              },
+              profile:       {
+                select: { slug: true, isPublished: true },
+              },
             },
           })
           if (dbUser) {
@@ -77,8 +75,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             session.user.subscription = dbUser.subscription
             session.user.profile      = dbUser.profile
           }
-        } catch {
+        } catch (e) {
           // Non-fatal — session still works with token data
+          console.error('[auth] session DB lookup failed:', e)
         }
       }
       return session
@@ -100,31 +99,48 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   events: {
+   
     async createUser({ user }) {
       if (!user.id) return
 
-      await Promise.all([
-        prisma.subscription.create({
+      try {
+        await prisma.subscription.create({
           data: {
             userId:      user.id,
             plan:        'FREE_TRIAL',
             status:      'TRIAL',
             trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           },
-        }),
-        prisma.notificationPrefs.create({
-          data: {
-            userId:         user.id,
-            emailOnLead:    true,
-            whatsappOnLead: true,   // ← changed to true so WhatsApp works immediately
-            weeklyDigest:   true,
-          },
-        }),
-      ])
+        })
+      } catch (e) {
+        // Log but don't throw — user must be able to sign in even if this fails
+        console.error('[auth] Failed to create subscription for new user:', e)
+      }
 
+      // 2. Create notification prefs — separate try/catch
+      try {
+        // Check if already exists (handles edge cases with Google re-auth)
+        const existing = await prisma.notificationPrefs.findFirst({
+          where: { userId: user.id },
+        })
+        if (!existing) {
+          await prisma.notificationPrefs.create({
+            data: {
+              userId:         user.id,
+              emailOnLead:    true,
+              whatsappOnLead: true,
+              weeklyDigest:   true,
+            },
+          })
+        }
+      } catch (e) {
+        console.error('[auth] Failed to create notification prefs:', e)
+      }
+
+      // 3. Send welcome email — separate try/catch, fully non-blocking
       if (user.email && user.name) {
         sendWelcomeEmail(user.email, user.name).catch(e => {
-          console.error('Failed to send welcome email:', e)
+          console.error('[auth] Failed to send welcome email:', e)
         })
       }
     },

@@ -1,9 +1,8 @@
 // talrat.com — Prisma Schema
-// Run: npx prisma db push && npx prisma generate
+// After editing run: npx prisma db push && npx prisma generate
 
 generator client {
-  provider   = "prisma-client-js"
-  
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -11,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── Auth (NextAuth v5 + Prisma Adapter) ────────────────────────────────────
+// Auth (NextAuth v5 + Prisma Adapter)
 
 model Account {
   id                String  @id @default(cuid())
@@ -48,7 +47,7 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ─── Users ───────────────────────────────────────────────────────────────────
+// Users
 
 model User {
   id            String    @id @default(cuid())
@@ -62,12 +61,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts     Account[]
-  sessions     Session[]
-  profile      Profile?
-  subscription Subscription?
-  tickets      SupportTicket[]
-  notifications NotificationPrefs?
+  accounts          Account[]
+  sessions          Session[]
+  profile           Profile?
+  subscription      Subscription?
+  tickets           SupportTicket[]
+  notifications     NotificationPrefs?
+  payments          Payment[]          // ← FIXED: added User → Payment relation
 
   @@index([email])
   @@index([role])
@@ -78,7 +78,7 @@ enum UserRole {
   ADMIN
 }
 
-// ─── Profiles ─────────────────────────────────────────────────────────────────
+//  Profiles 
 
 model Profile {
   id           String       @id @default(cuid())
@@ -92,17 +92,17 @@ model Profile {
   location     String?
   avatarUrl    String?
   availability Availability @default(AVAILABLE)
-  experience   Int?         // years
+  experience   Int?
 
   // Rate card (3 tiers)
-  tier1Label   String?      @default("Quick Call")
-  tier1Price   Int?         // in INR paise
+  tier1Label   String?
+  tier1Price   Int?
   tier1Desc    String?
-  tier2Label   String?      @default("Half Day")
+  tier2Label   String?
   tier2Price   Int?
   tier2Desc    String?
   tier2Popular Boolean      @default(true)
-  tier3Label   String?      @default("Full Project")
+  tier3Label   String?
   tier3Price   Int?
   tier3Desc    String?
 
@@ -116,16 +116,10 @@ model Profile {
   dribbbleUrl  String?
   behanceUrl   String?
 
-  // Adaptive fields (stored as JSON per talent type)
   adaptiveData Json?
-
-  // Work samples (up to 6)
   workSamples  WorkSample[]
-
-  // Skills (tags)
   skills       Skill[]
 
-  // Analytics
   totalViews   Int          @default(0)
   totalLeads   Int          @default(0)
 
@@ -199,16 +193,16 @@ model Skill {
 // ─── Analytics ────────────────────────────────────────────────────────────────
 
 model Analytics {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   profileId String
   event     AnalyticsEvent
-  source    String?  // utm_source or referrer
-  location  String?  // country code
+  source    String?
+  location  String?
   userAgent String?
   ip        String?
-  createdAt DateTime @default(now())
+  createdAt DateTime       @default(now())
 
-  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([profileId])
   @@index([createdAt])
@@ -223,72 +217,65 @@ enum AnalyticsEvent {
 }
 
 model Lead {
-  id          String   @id @default(cuid())
-  profileId   String
-  name        String
-  email       String
-  company     String?
-  message     String   @db.Text
-  phone       String?
-  source      String?
-  notified    Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  profileId String
+  name      String
+  email     String
+  company   String?
+  message   String   @db.Text
+  phone     String?
+  source    String?
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
 
-  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([profileId])
   @@index([createdAt])
 }
 
-// ─── Metrics Snapshots (for admin dashboard) ─────────────────────────────────
+// ─── Metrics Snapshots ────────────────────────────────────────────────────────
 
 model MetricsSnapshot {
-  id              String   @id @default(cuid())
-  date            DateTime @unique
-  totalUsers      Int      @default(0)
-  activeUsers     Int      @default(0)
-  paidUsers       Int      @default(0)
-  trialUsers      Int      @default(0)
-  mrr             Int      @default(0)   // in INR paise
-  arr             Int      @default(0)
-  newSignups      Int      @default(0)
-  churned         Int      @default(0)
-  profileViews    Int      @default(0)
-  leadsGenerated  Int      @default(0)
-  createdAt       DateTime @default(now())
+  id             String   @id @default(cuid())
+  date           DateTime @unique
+  totalUsers     Int      @default(0)
+  activeUsers    Int      @default(0)
+  paidUsers      Int      @default(0)
+  trialUsers     Int      @default(0)
+  mrr            Int      @default(0)
+  arr            Int      @default(0)
+  newSignups     Int      @default(0)
+  churned        Int      @default(0)
+  profileViews   Int      @default(0)
+  leadsGenerated Int      @default(0)
+  createdAt      DateTime @default(now())
 }
 
 // ─── Subscriptions ────────────────────────────────────────────────────────────
 
 model Subscription {
-  id                   String             @id @default(cuid())
-  userId               String             @unique
-  plan                 Plan               @default(FREE_TRIAL)
-  status               SubscriptionStatus @default(TRIAL)
-  trialEndsAt          DateTime?
-  currentPeriodStart   DateTime?
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean            @default(false)
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  plan               Plan               @default(FREE_TRIAL)
+  status             SubscriptionStatus @default(TRIAL)
+  trialEndsAt        DateTime?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean            @default(false)
+  razorpayOrderId    String?
+  razorpayPaymentId  String?
+  razorpayCustomerId String?
+  razorpaySubId      String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
-  // Razorpay
-  razorpayOrderId    String?   // order_xxx
-  razorpayPaymentId  String?   // pay_xxx
-  
-  razorpayCustomerId   String?
-  razorpaySubId        String?
-
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payments             Payment[]
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
 
   @@index([status])
   @@index([plan])
 }
-
-
-
 
 enum Plan {
   FREE_TRIAL
@@ -304,26 +291,32 @@ enum SubscriptionStatus {
 }
 
 model Payment {
-  id               String        @id @default(cuid())
-    userId    String
-    description String?   
-  subscriptionId   String
-  amount           Int           // in INR paise
-  currency         String        @default("INR")
-  status           PaymentStatus @default(PENDING)
-  razorpayOrderId  String?       @unique
-  razorpayPayId    String?       @unique
-  invoiceUrl       String?
-  createdAt        DateTime      @default(now())
-  paymentId String? @unique 
-  subscription     Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  userId         String                             // ← kept
+  subscriptionId String?                            // ← made optional (not always linked)
+  amount         Int
+  currency       String        @default("INR")
+  status         PaymentStatus @default(PENDING)
+  provider       String        @default("RAZORPAY") // ← ADDED (was missing)
+  orderId        String?
+  paymentId      String?       @unique
+  razorpayOrderId String?      @unique
+  razorpayPayId   String?      @unique
+  description    String?
+  invoiceUrl     String?
+  createdAt      DateTime      @default(now())
 
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade) // ← ADDED
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])            // ← made optional
+
+  @@index([userId])
   @@index([subscriptionId])
   @@index([createdAt])
 }
 
 enum PaymentStatus {
   PENDING
+  CAPTURED   // ← ADDED (was missing, used in billing verify route)
   SUCCESS
   FAILED
   REFUNDED
@@ -332,19 +325,29 @@ enum PaymentStatus {
 // ─── Support Tickets ──────────────────────────────────────────────────────────
 
 model SupportTicket {
-  id        String       @id @default(cuid())
+  id        String         @id @default(cuid())
   userId    String
   subject   String
-  status    TicketStatus @default(OPEN)
+  category  TicketCategory @default(OTHER)  // ← ADDED (was missing)
+  status    TicketStatus   @default(OPEN)
   priority  TicketPriority @default(MEDIUM)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages  TicketMessage[]
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages TicketMessage[]
 
   @@index([userId])
   @@index([status])
+}
+
+// ← ADDED (was missing entirely)
+enum TicketCategory {
+  BILLING
+  TECHNICAL
+  ACCOUNT
+  FEATURE_REQUEST
+  OTHER
 }
 
 enum TicketStatus {
@@ -362,11 +365,12 @@ enum TicketPriority {
 }
 
 model TicketMessage {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   ticketId  String
-  body      String   @db.Text
-  isAdmin   Boolean  @default(false)
-  createdAt DateTime @default(now())
+  userId    String?                            // ← made optional for admin replies
+  body      String        @db.Text
+  isAdmin   Boolean       @default(false)
+  createdAt DateTime      @default(now())
 
   ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
@@ -376,13 +380,13 @@ model TicketMessage {
 // ─── Notification Preferences ─────────────────────────────────────────────────
 
 model NotificationPrefs {
-  id              String  @id @default(cuid())
-  userId          String  @unique
-  emailOnView     Boolean @default(false)
-  emailOnLead     Boolean @default(true)
-  whatsappOnView  Boolean @default(false)
-  whatsappOnLead  Boolean @default(true)
-  weeklyDigest    Boolean @default(true)
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  emailOnView    Boolean @default(false)
+  emailOnLead    Boolean @default(true)
+  whatsappOnView Boolean @default(false)
+  whatsappOnLead Boolean @default(true)
+  weeklyDigest   Boolean @default(true)
 
-  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
