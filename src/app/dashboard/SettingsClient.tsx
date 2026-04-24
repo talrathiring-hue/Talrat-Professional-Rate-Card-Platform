@@ -236,7 +236,7 @@ function AccountTab({ user }: { user: UserData }) {
             </div>
             <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
               <MessageSquare className="w-3 h-3" />
-              You'll get instant WhatsApp messages when clients contact you
+              {"You will get instant WhatsApp messages when clients contact you"}
             </p>
           </div>
 
@@ -551,7 +551,7 @@ function SupportTab({ tickets: initial }: { tickets: Ticket[] }) {
           <HelpCircle className="w-8 h-8 text-slate-200 mx-auto mb-3" />
           <p className="text-sm font-medium text-slate-500 mb-1">No tickets yet</p>
           <p className="text-xs text-slate-400">
-            Have a question or issue? Open a support ticket and we'll help.
+            Have a question or issue? Open a support ticket and we will help.
           </p>
         </div>
       ) : (
@@ -602,7 +602,7 @@ function SupportTab({ tickets: initial }: { tickets: Ticket[] }) {
 
                   {ticket.status === 'OPEN' && (
                     <p className="text-xs text-slate-400 text-center py-1">
-                      We'll reply here and notify you by email
+                      We will reply here and notify you by email
                     </p>
                   )}
                 </div>
